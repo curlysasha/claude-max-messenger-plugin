@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Skill(update-config)",
+      "WebSearch",
+      "mcp__plugin_max_max__reply"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "max"
+  ]
+}
