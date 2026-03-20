@@ -16,6 +16,8 @@ MCP-сервер, который подключает [Claude Code](https://clau
 - Нет истории сообщений и поиска (Bot API Max не поддерживает)
 - Бот видит только сообщения, пришедшие после запуска
 
+![Плагин в действии](docs/screenshot.webp)
+
 ## Установка
 
 ### 1. Клонировать репозиторий
@@ -75,8 +77,6 @@ claude --dangerously-load-development-channels plugin:max@local-plugins
 ```
 /max:access pair <код>
 ```
-
-![Плагин в действии](docs/screenshot.webp)
 
 ### 7. Заблокировать доступ (рекомендуется)
 
