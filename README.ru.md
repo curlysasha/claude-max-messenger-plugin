@@ -1,6 +1,8 @@
-# Max Messenger Channel для Claude Code
+# claude-max-messenger-plugin
 
-MCP-сервер, который подключает Claude Code к [Max мессенджеру](https://max.ru) через Bot API.
+MCP-сервер, который подключает [Claude Code](https://claude.ai/code) к [Max мессенджеру](https://max.ru) через Bot API. Пишите боту в Max — Claude отвечает прямо из терминала.
+
+![Плагин в действии](docs/screenshot.webp)
 
 ## Возможности
 
@@ -75,6 +77,8 @@ claude --dangerously-load-development-channels plugin:max@local-plugins
 ```
 
 ### 7. Заблокировать доступ (рекомендуется)
+
+![Контроль доступа](docs/access-control.webp)
 
 Когда все нужные пользователи сопряжены, переключитесь в режим белого списка:
 

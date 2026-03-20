@@ -1,76 +1,110 @@
-# Max Messenger Channel for Claude Code
+# claude-max-messenger-plugin
 
-MCP server that connects Claude Code to [Max messenger](https://max.ru) via the Bot API.
+MCP-сервер, который подключает [Claude Code](https://claude.ai/code) к [Max мессенджеру](https://max.ru) через Bot API. Пишите боту в Max — Claude отвечает прямо из терминала.
 
-## Features
+![Плагин в действии](docs/screenshot.webp)
 
-- **reply** tool — send messages with optional file attachments (max 50MB each)
-- **edit_message** tool — update previously sent bot messages (e.g. progress → result)
-- Access control with pairing codes, allowlists, and group support
-- Photo download and forwarding to Claude
+## Возможности
 
-## Limitations
+- Инструмент **reply** — отправка сообщений с вложениями (до 50 МБ каждое)
+- Инструмент **edit_message** — редактирование ранее отправленных сообщений (например, «обрабатываю…» → результат)
+- Контроль доступа: коды сопряжения, белые списки, поддержка групп
+- Скачивание фото и передача их Клоду
 
-- No message history or search (Max Bot API doesn't support it)
-- The bot only sees messages as they arrive
+## Ограничения
 
-## Setup
+- Нет истории сообщений и поиска (Bot API Max не поддерживает)
+- Бот видит только сообщения, пришедшие после запуска
 
-### 1. Get a bot token
+## Установка
 
-Open Max messenger → search for **@MasterBot** → create a new bot → copy the token.
+### 1. Клонировать репозиторий
 
-### 2. Save the token
+Склонируйте в любую удобную папку, например `C:/GIT`:
+
+```sh
+git clone https://github.com/your/claude_max_plugin C:/GIT/claude_max_plugin
+```
+
+### 2. Зарегистрировать локальный маркетплейс
+
+Добавьте в `~/.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "local-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "C:/GIT"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "max@local-plugins": true
+  }
+}
+```
+
+Путь `C:/GIT` — это папка, **внутри которой** лежит `claude_max_plugin/`. Claude Code сканирует её в поисках плагинов. Если склонировали в другое место (например, `D:/projects/claude_max_plugin`), укажите `D:/projects`.
+
+### 3. Получить токен бота
+
+> **Внимание:** токен выдаётся только через [бизнес-платформу](https://business.max.ru/) и требует ИП или юрлицо. Telegram такого не требует, но мы здесь не для того, чтобы спорить с Max.
+
+Зарегистрируйтесь на [business.max.ru](https://business.max.ru/) → создайте бота → скопируйте токен.
+
+### 4. Сохранить токен
 
 ```
-/max:configure <your-token>
+/max:configure <ваш-токен>
 ```
 
-### 3. Launch with the channel flag
+### 5. Запустить с флагом канала
 
-The channel won't connect without this flag. Exit your session and start a new one.
-
-Since channels are in **research preview** and only official Anthropic plugins are on the approved allowlist, use the development flag for local plugins:
+Каналы находятся в **research preview**, и только официальные плагины Anthropic попадают в список разрешённых. Для локальных плагинов используйте флаг разработки. Завершите текущую сессию и запустите новую:
 
 ```sh
 claude --dangerously-load-development-channels plugin:max@local-plugins
 ```
 
-### 4. Pair yourself
+### 6. Сопрячь себя
 
-DM your bot in Max. It will reply with a pairing code. Approve it:
+Напишите своему боту в Max. Он ответит кодом сопряжения. Одобрите его:
 
 ```
-/max:access pair <code>
+/max:access pair <код>
 ```
 
-### 5. Lock down access (recommended)
+### 7. Заблокировать доступ (рекомендуется)
 
-Once everyone is paired, switch to allowlist mode:
+![Контроль доступа](docs/access-control.webp)
+
+Когда все нужные пользователи сопряжены, переключитесь в режим белого списка:
 
 ```
 /max:access policy allowlist
 ```
 
-## Access management
+## Управление доступом
 
-See [ACCESS.md](./ACCESS.md) for full documentation on access control.
+Подробная документация — в [ACCESS.md](./ACCESS.md).
 
-## Environment variables
+## Переменные окружения
 
-| Variable | Description |
+| Переменная | Описание |
 |---|---|
-| `MAX_BOT_TOKEN` | Bot token from @MasterBot (set via `/max:configure`) |
-| `MAX_ACCESS_MODE` | Set to `static` to snapshot access at boot (no pairing) |
+| `MAX_BOT_TOKEN` | Токен бота (сохраняется через `/max:configure`) |
+| `MAX_ACCESS_MODE` | Установите `static`, чтобы зафиксировать доступ при запуске (без сопряжения) |
 
-## State directory
+## Директория состояния
 
-All state is stored in `~/.claude/channels/max/`:
+Всё состояние хранится в `~/.claude/channels/max/`:
 
 ```
 ~/.claude/channels/max/
-├── .env          ← bot token
-├── access.json   ← access control config
-├── inbox/        ← downloaded photos (temporary)
-└── approved/     ← pairing confirmations (consumed by server)
+├── .env          ← токен бота
+├── access.json   ← настройки контроля доступа
+├── inbox/        ← скачанные фото (временные)
+└── approved/     ← подтверждения сопряжения (обрабатываются сервером)
 ```
