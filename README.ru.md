@@ -2,7 +2,7 @@
 
 MCP-сервер, который подключает [Claude Code](https://claude.ai/code) к [Max мессенджеру](https://max.ru) через Bot API. Пишите боту в Max — Claude отвечает прямо из терминала.
 
-![Плагин в действии](docs/screenshot.webp)
+![Контроль доступа](docs/access-control.webp)
 
 ## Возможности
 
@@ -76,9 +76,9 @@ claude --dangerously-load-development-channels plugin:max@local-plugins
 /max:access pair <код>
 ```
 
-### 7. Заблокировать доступ (рекомендуется)
+![Плагин в действии](docs/screenshot.webp)
 
-![Контроль доступа](docs/access-control.webp)
+### 7. Заблокировать доступ (рекомендуется)
 
 Когда все нужные пользователи сопряжены, переключитесь в режим белого списка:
 
