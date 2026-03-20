@@ -25,7 +25,7 @@ MCP-сервер, который подключает [Claude Code](https://clau
 Склонируйте в любую удобную папку, например `C:/GIT`:
 
 ```sh
-git clone https://github.com/your/claude_max_plugin C:/GIT/claude_max_plugin
+git clone https://github.com/curlysasha/claude-max-messenger-plugin C:/GIT/claude_max_plugin
 ```
 
 ### 2. Зарегистрировать локальный маркетплейс
