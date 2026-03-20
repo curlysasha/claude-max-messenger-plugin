@@ -22,7 +22,7 @@ import {
   statSync, renameSync, realpathSync,
 } from 'fs'
 import { homedir } from 'os'
-import { join, extname, sep } from 'path'
+import { join, extname, basename, sep } from 'path'
 
 const STATE_DIR = join(homedir(), '.claude', 'channels', 'max')
 const ACCESS_FILE = join(STATE_DIR, 'access.json')
@@ -294,6 +294,20 @@ function chunk(text: string, limit: number, mode: 'length' | 'newline'): string[
 }
 
 const IMAGE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp'])
+const MAX_API = 'https://botapi.max.ru'
+
+// Upload a file directly via multipart, preserving the original filename.
+// The SDK's ReadStream path is broken on Bun (non-standard FormData object);
+// the Buffer path loses the filename. We bypass both and do it ourselves.
+async function uploadAttachment(filePath: string, type: 'image' | 'file'): Promise<unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { url } = await (bot.api as any).raw.uploads.getUploadUrl({ type }) as { url: string }
+  const buf = readFileSync(filePath)
+  const form = new FormData()
+  form.append('data', new Blob([buf]), basename(filePath))
+  const res = await fetch(url, { method: 'POST', body: form })
+  return res.json()
+}
 
 const mcp = new Server(
   { name: 'max', version: '1.0.0' },
@@ -393,12 +407,17 @@ mcp.setRequestHandler(CallToolRequestSchema, async req => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let attachment: any
           if (IMAGE_EXTS.has(ext)) {
-            attachment = await bot.api.uploadImage({ source: f })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const uploaded = await uploadAttachment(f, 'image') as any
+            const payload = uploaded.photos ? { photos: uploaded.photos } : { token: uploaded.token }
+            attachment = { type: 'image', payload }
           } else {
-            attachment = await bot.api.uploadFile({ source: f })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const uploaded = await uploadAttachment(f, 'file') as any
+            attachment = { type: 'file', payload: { token: uploaded.token } }
           }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const sent = await bot.api.sendMessageToChat(chatId, '', { attachments: [attachment] }) as any
+          const sent = await bot.api.sendMessageToChat(chatId, ' ', { attachments: [attachment] }) as any
           const mid = sent?.message?.mid ?? sent?.mid ?? sent?.body?.mid
           if (mid) sentIds.push(String(mid))
         }
